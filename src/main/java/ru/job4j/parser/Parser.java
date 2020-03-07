@@ -21,7 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser implements Job {
-    private String url = "https://www.sql.ru/forum/job-offers";
     private Map<String, String> mapMonths = new HashMap<>();
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yy, HH:mm");
     private DateTimeFormatter briefFormat = DateTimeFormatter.ofPattern("d MMM yy");
@@ -37,7 +36,7 @@ public class Parser implements Job {
             limitDay = prevDateRunJob.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
         Parser parser = new Parser();
-        parser.pagesToParse();
+        parser.pagesToParse(config.getString("website"));
         parser.writeToDB(config.getString("url"), config.getString("username"), config.getString("password"));
     }
 
@@ -98,7 +97,7 @@ public class Parser implements Job {
         con.setAutoCommit(true);
     }
 
-    private void pagesToParse() {
+    private void pagesToParse(String website) {
         initMapMonths();
         Document doc;
         try {
@@ -108,9 +107,9 @@ public class Parser implements Job {
             while (!exit) {
                 i++;
                 if (i == 1) {
-                    address = url;
+                    address = website;
                 } else {
-                    address = String.format("%s/%s", url, String.valueOf(i));
+                    address = String.format("%s/%s", website, String.valueOf(i));
                 }
                 doc = Jsoup.connect(address).get();
                 Element table = doc.selectFirst("table.forumTable");

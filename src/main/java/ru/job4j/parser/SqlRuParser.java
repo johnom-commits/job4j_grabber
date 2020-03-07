@@ -21,6 +21,7 @@ public class SqlRuParser {
             map.put("url", conf.getProperty("url"));
             map.put("username", conf.getProperty("username"));
             map.put("password", conf.getProperty("password"));
+            map.put("website", conf.getProperty("website"));
 
             JobDetail job = newJob(Parser.class)
                     .withIdentity("job1", "group1")

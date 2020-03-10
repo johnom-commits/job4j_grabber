@@ -21,7 +21,7 @@ public class Parser implements Job {
         }
         ParserSite parser = new ParserSQLru();
         List<Vacancy> vacancyList = parser.pagesToParse(limitDay);
-        WriteToDB db = new WriteToDB(vacancyList);
-        db.writeToDB(config.getString("url"), config.getString("username"), config.getString("password"));
+        WriteToDB db = new WriteToDB();
+        db.writeToDB(config.getString("url"), config.getString("username"), config.getString("password"), vacancyList);
     }
 }

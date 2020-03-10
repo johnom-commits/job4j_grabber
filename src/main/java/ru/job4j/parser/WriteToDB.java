@@ -4,16 +4,11 @@ import java.sql.*;
 import java.util.List;
 
 public class WriteToDB {
-    List<Vacancy> vacancyList;
 
-    public WriteToDB(List<Vacancy> vacancyList) {
-        this.vacancyList = vacancyList;
-    }
-
-    public void writeToDB(String urlBase, String username, String password) {
+    public void writeToDB(String urlBase, String username, String password, List<Vacancy> vacancyList) {
         try (Connection con = DriverManager.getConnection(urlBase, username, password)) {
             initTableDB(con);
-            vacanciesToDB(con);
+            vacanciesToDB(con, vacancyList);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -27,7 +22,7 @@ public class WriteToDB {
         }
     }
 
-    public void vacanciesToDB(Connection con) throws SQLException {
+    public void vacanciesToDB(Connection con, List<Vacancy> vacancyList) throws SQLException {
         con.setAutoCommit(false);
         try (final PreparedStatement st = con.prepareStatement("INSERT INTO vacancies (name, text, link) VALUES (?, ?, ?)")) {
             for (Vacancy vacancy : vacancyList) {

@@ -1,9 +1,8 @@
 package ru.job4j.parser;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ParserSite {
-    void pagesToParse(LocalDateTime limitDay);
-
-    void writeToDB(String url, String username, String password);
+    List<Vacancy> pagesToParse(LocalDateTime limitDay);
 }

@@ -6,9 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
-import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,49 +40,7 @@ public class ParserSQLru implements ParserSite {
         mapMonths.put("дек", "дек.");
     }
 
-    public void writeToDB(String urlBase, String username, String password) {
-        try (Connection con = DriverManager.getConnection(urlBase, username, password)) {
-            initTableDB(con);
-            vacanciesToDB(con);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            LOG.error(ex.getMessage());
-        }
-    }
-
-    private void initTableDB(Connection con) {
-        try (final Statement st = con.createStatement()) {
-            st.execute("CREATE TABLE IF NOT EXISTS vacancies (id serial PRIMARY KEY, name varchar(400) NOT NULL UNIQUE, text text, link varchar(400))");
-        } catch (SQLException e) {
-            LOG.error(e.getMessage());
-        }
-    }
-
-    public void vacanciesToDB(Connection con) throws SQLException {
-        con.setAutoCommit(false);
-        try (final PreparedStatement st = con.prepareStatement("INSERT INTO vacancies (name, text, link) VALUES (?, ?, ?)")) {
-            for (Vacancy vacancy : vacancies) {
-                st.setString(1, vacancy.getName());
-                st.setString(2, vacancy.getText());
-                st.setString(3, vacancy.getLink());
-                st.addBatch();
-            }
-            st.executeBatch();
-            con.commit();
-        } catch (SQLException ex) {
-            LOG.error(ex.getMessage());
-            if (con != null) {
-                try {
-                    con.rollback();
-                } catch (SQLException exp) {
-                    LOG.error(exp.getMessage());
-                }
-            }
-        }
-        con.setAutoCommit(true);
-    }
-
-    public void pagesToParse(LocalDateTime limitDay) {
+    public List<Vacancy> pagesToParse(LocalDateTime limitDay) {
         initMapMonths();
         Document doc;
         try {
@@ -136,6 +92,7 @@ public class ParserSQLru implements ParserSite {
         } catch (IOException e) {
             LOG.error(e.getMessage());
         }
+        return vacancies;
     }
 
     private LocalDateTime getDate(String data) {
